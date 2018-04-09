@@ -43,7 +43,7 @@ for i in range (2,total_pages):
 
 with open ('icobench_data.csv','w') as outfile:
    csv_writer= csv.writer (outfile)
-   csv_writer.writerow (["name", 'norm_name', "symbol", "domains", "website", "start_date", "end_date", "avg", "rated_by", "profile_rating", "team_rating", "vision_rating", "product_rating","PreICO_Price","Price","Platform","Accepting","Minimum_investment","Soft_cap","Hard_cap","Country","Whitelist_KYC","Restricted_areas","preICO_start","preICO_end","ICO_start","ICO_end","Raised","Status"])
+   csv_writer.writerow (["name", 'norm_name', "symbol", "rating", "domain", "website", "start_date", "end_date",  "rated_by", "profile_rating", "team_rating", "vision_rating", "product_rating","PreICO_Price","Price","Platform","Accepting","Minimum_investment","Soft_cap","Hard_cap","Country","Whitelist_KYC","Restricted_areas","preICO_start","preICO_end","ICO_start","ICO_end","Raised","Status", "source"])
 
 for page in pages:
 
@@ -89,6 +89,7 @@ for page in pages:
    #print (categs)
 
    #ratings
+   source = 'icobench'
    avg= ''
    profile= ''
    team= ''
@@ -119,6 +120,12 @@ for page in pages:
    		text = soup.find_all("div",{"class":"financial_data"})[0].find('a', class_="button_big")['href']
    		spltAr = text.split("://")
    		spltAr = re.sub(r'www\.','',spltAr[1])
+   		spltAr = re.sub(r'tokensale\.','',spltAr)
+   		spltAr = re.sub(r'token\.','',spltAr)
+   		spltAr = re.sub(r'tokens\.','',spltAr)
+   		spltAr = re.sub(r'ico\.','',spltAr)
+   		spltAr = re.sub(r'coin\.','',spltAr)
+   		spltAr = re.sub(r'crowdsale\.','',spltAr)
    		#i = (0,1)[len(spltAr)>1]
    		domain = spltAr.split("?")[0].split('/')[0].split(':')[0].lower()
    except: pass
@@ -236,4 +243,4 @@ for page in pages:
 
    with open ('icobench_data.csv','a') as outfile:
       csv_writer= csv.writer (outfile)
-      csv_writer.writerow ([title, tmp, Token, domain, url, start, end, avg, Rated_by, profile, team, vision, product,PreICO_Price,Price,Platform,Accepting,Minimum_investment,Soft_cap,Hard_cap,Country,Whitelist_KYC,Restricted_areas,preICO_start,preICO_end,ICO_start,ICO_end,Raised,Status])
+      csv_writer.writerow ([title, tmp, Token, domain, avg, url, start, end,  Rated_by, profile, team, vision, product,PreICO_Price,Price,Platform,Accepting,Minimum_investment,Soft_cap,Hard_cap,Country,Whitelist_KYC,Restricted_areas,preICO_start,preICO_end,ICO_start,ICO_end,Raised,Status, source])
