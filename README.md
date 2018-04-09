@@ -1,2 +1,2 @@
 # ico
-Webscrapping for different ICO websites
+Webcrawler for different ICO websites
