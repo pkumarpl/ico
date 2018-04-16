@@ -9,7 +9,7 @@ from dateutil import parser
 import pandas as pd
 from daterangeparser import parse
 
-url = 'https://icodrops.com/category/upcoming-ico/'
+url = 'https://icodrops.com/category/active-ico/'
 
 browser = webdriver.PhantomJS()
 browser.get(url)
@@ -57,6 +57,7 @@ def subpage_data(url):
 	date = ''
 	token = ''
 	start = ''
+	cat = ''
 	end = ''
 	source = 'icodrops'
 	web = ''
@@ -116,15 +117,21 @@ def subpage_data(url):
 		icorate = ''
 	
 	try:
+		cat = soup.find('div', class_='ico-category-name').get_text()
+		cat = re.sub('[()]', '', cat)
+	except:
+		cat = ''
+	
+	try:
 		text = soup.find("div", {"class": "button"}).parent['href']
 		spltAr = text.split("://")
 		spltAr = re.sub(r'www\.','',spltAr[1])
-		spltAr = re.sub(r'tokensale\.','',spltAr)
-		spltAr = re.sub(r'token\.','',spltAr)
-		spltAr = re.sub(r'tokens\.','',spltAr)
-		spltAr = re.sub(r'ico\.','',spltAr)
-		spltAr = re.sub(r'coin\.','',spltAr)
-		spltAr = re.sub(r'crowdsale\.','',spltAr)
+		spltAr = re.sub(r'^tokensale\.','',spltAr)
+		spltAr = re.sub(r'^token\.','',spltAr)
+		spltAr = re.sub(r'^tokens\.','',spltAr)
+		spltAr = re.sub(r'^ico\.','',spltAr)
+		spltAr = re.sub(r'^coin\.','',spltAr)
+		spltAr = re.sub(r'^crowdsale\.','',spltAr)
 		#print(spltAr)
 		#i = (0,1)[len(spltAr)>1]
 		domain = spltAr.split("?")[0].split('/')[0].split(':')[0].lower()
@@ -157,9 +164,9 @@ def subpage_data(url):
 	except:
 		pass
 		
-	return [price, goal, date, start, end, token, hype, risk, roi, icorate, domain, web]
+	return [price, goal, date, start, end, token, hype, risk, roi, icorate, domain, source, cat, web]
 
-columns = ['name', 'norm_name', 'symbol', 'rating', 'domain', 'website', 'date', 'ico_price', 'start_date', 'end_date',  'hype_rating', 'risk_rating', 'roi_rating', 'raised', 'goal', 'source']
+columns = ['name', 'norm_name', 'symbol', 'rating', 'domain', 'website', 'date', 'ico_price', 'start_date', 'end_date',  'hype_rating', 'risk_rating', 'roi_rating', 'raised', 'goal', 'category', 'source']
 data = []
 
 for ico in icos:
@@ -171,13 +178,13 @@ for ico in icos:
 	
 	url = ico['href']
 	#rate = ''
-	[price, goal, date, start, end, token, hype, risk, roi, icorate, domain, source, web] = subpage_data(url)
+	[price, goal, date, start, end, token, hype, risk, roi, icorate, domain, source, cat, web] = subpage_data(url)
 	#try:
 	##	rate = r.text.strip()
 	#except:
 	#	rate = 'NA'
 	#print(start, end)
-	line = [name, tmp, token, icorate, domain, web, date,  price, start, end,  hype, risk, roi, raised(ico), goal, source]
+	line = [name, tmp, token, icorate, domain, web, date,  price, start, end,  hype, risk, roi, raised(ico), goal, cat , source]
 	print(line)
 	data.append(line)
 
@@ -185,13 +192,13 @@ for ico in icos:
 now = datetime.datetime.now()
 date = now.strftime("%Y_%m_%d")
 
-with open("upcoming_ico_data_" + date + ".csv", "w+") as my_csv:
+with open("active_ico_data_" + date + ".csv", "w+") as my_csv:
 	csvWriter = csv.writer(my_csv, delimiter=',')
 	csvWriter.writerow(columns)
 	csvWriter.writerows(data)
 
-icodrop = pd.read_csv("upcoming_ico_data_" + date + ".csv", sep=',')
+icodrop = pd.read_csv("active_ico_data_" + date + ".csv", sep=',')
 df = icodrop.drop_duplicates()
 
-df.to_csv("upcoming_ico_clean_" + date + ".csv", encoding='utf-8', index=False)
-df.to_pickle("upcoming_ico_clean_" + date + ".pkl")
+df.to_csv("active_ico_clean_" + date + ".csv", encoding='utf-8', index=False)
+df.to_pickle("active_ico_clean_" + date + ".pkl")

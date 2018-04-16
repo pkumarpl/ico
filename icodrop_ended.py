@@ -58,6 +58,7 @@ def subpage_data(url):
 	hype = ''
 	risk = ''
 	roi = ''
+	cat = ''
 	icorate = ''
 	domain = ''
 	source = 'icodrops'
@@ -87,6 +88,11 @@ def subpage_data(url):
 		date = text.find('div', class_="sale-date").text.strip()
 	except:
 		date = ''
+	
+	try:
+		cat = soup.find('div', class_='ico-category-name').get_text()
+	except:
+		cat = ''
 	
 	try:
 		tk = soup.findAll('div', class_='col-12 col-md-6')[0].findAll('li')[0].text
@@ -127,12 +133,12 @@ def subpage_data(url):
 		text = soup.find("div", {"class": "button"}).parent['href']
 		spltAr = text.split("://")
 		spltAr = re.sub(r'www\.','',spltAr[1])
-		spltAr = re.sub(r'tokensale\.','',spltAr)
-		spltAr = re.sub(r'token\.','',spltAr)
-		spltAr = re.sub(r'tokens\.','',spltAr)
-		spltAr = re.sub(r'ico\.','',spltAr)
-		spltAr = re.sub(r'coin\.','',spltAr)
-		spltAr = re.sub(r'crowdsale\.','',spltAr)
+		spltAr = re.sub(r'^tokensale\.','',spltAr)
+		spltAr = re.sub(r'^token\.','',spltAr)
+		spltAr = re.sub(r'^tokens\.','',spltAr)
+		spltAr = re.sub(r'^ico\.','',spltAr)
+		spltAr = re.sub(r'^coin\.','',spltAr)
+		spltAr = re.sub(r'^crowdsale\.','',spltAr)
 		#print(spltAr)
 		#i = (0,1)[len(spltAr)>1]
 		domain = spltAr.split("?")[0].split('/')[0].split(':')[0].lower()
@@ -146,9 +152,9 @@ def subpage_data(url):
 	except:
 		web = ''
 
-	return [price, goal, date, token, hype, risk, roi, icorate, domain, source, web]
+	return [price, goal, date, token, hype, risk, roi, icorate, domain, source, web, cat]
 
-columns = ['name', 'norm_name', 'symbol', 'rating', 'domain', 'website', 'ico_price', 'end_date', 'hype_rating', 'risk_rating', 'roi_rating', 'raised', 'goal', 'source']
+columns = ['name', 'norm_name', 'symbol', 'rating', 'domain', 'website', 'ico_price', 'end_date', 'hype_rating', 'risk_rating', 'roi_rating', 'raised', 'goal', 'category', 'source']
 
 data = []
 
@@ -159,13 +165,13 @@ for ico in icos:
 	tmp = re.sub(r'\(.*\)','', tmp)
 	tmp = tmp.lower().strip()
 	url = ico['href']
-	[price, goal, date, token, hype, risk, roi, icorate, domain, source, web] = subpage_data(url)
+	[price, goal, date, token, hype, risk, roi, icorate, domain, source, web, cat] = subpage_data(url)
 	#try:
 	#	r = ico.find('div', class_='all_site_val')
 	#	rate = r.text.strip()
 	#except:
 	#	rate = 'NA'
-	line = [name, tmp, token, icorate, domain, web, price, add_year(date),  hype, risk, roi, raised(ico), goal, source]
+	line = [name, tmp, token, icorate, domain, web, price, add_year(date),  hype, risk, roi, raised(ico), goal, cat, source]
 	print(line)
 	data.append(line)
 
